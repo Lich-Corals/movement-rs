@@ -3,10 +3,12 @@ use std::{thread, time};
 
 const END_FIGURE_TIMEOUT: u8 = 5;
 
-#[derive(Clone, Default, PartialEq)]
-struct Coordinate {
-    x: i32,
-    y: i32,
+fn summation(start: i32, end: i32) {
+    let mut sum: i32 = 0;
+    for i in start..end+1 {
+        sum += 3*i-1;
+    }
+    println!("{}", sum);
 }
 
 fn get_mouse_position() -> Coordinate {
@@ -15,6 +17,12 @@ fn get_mouse_position() -> Coordinate {
         Mouse::Position { x, y } => Coordinate { x: x, y: y },
         Mouse::Error => Coordinate { x: 0, y: 0 },
     }
+}
+
+#[derive(Clone, Default, PartialEq)]
+struct Coordinate {
+    x: i32,
+    y: i32,
 }
 
 #[derive(Clone, Default)]
@@ -95,6 +103,7 @@ impl Recording {
 
 impl Shape {
     fn get_shape_name(&mut self) -> ShapeName {
+        summation(2, 3);
         ShapeName::Unknown
     }
 
