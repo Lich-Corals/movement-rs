@@ -1,0 +1,9 @@
+/home/linus/ApplicationDumpster/movement/target/debug/deps/libmouse_position-18ba4f79451617cd.rmeta: /home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/lib.rs /home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/impl_linux.rs /home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/impl_windows.rs /home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/impl_macos.rs /home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/mouse_position.rs
+
+/home/linus/ApplicationDumpster/movement/target/debug/deps/mouse_position-18ba4f79451617cd.d: /home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/lib.rs /home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/impl_linux.rs /home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/impl_windows.rs /home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/impl_macos.rs /home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/mouse_position.rs
+
+/home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/lib.rs:
+/home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/impl_linux.rs:
+/home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/impl_windows.rs:
+/home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/impl_macos.rs:
+/home/linus/.cargo/registry/src/index.crates.io-6f17d22bba15001f/mouse_position-0.1.4/src/mouse_position.rs:
