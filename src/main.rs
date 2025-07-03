@@ -1,9 +1,13 @@
 use mouse_position::mouse_position::{Mouse};
-use std::{arch::x86_64, thread, time};
+use std::path::absolute;
+use std::{thread, time};
+use std::ops::{Sub, Add};
 
 const END_FIGURE_TIMEOUT: u8 = 5;
 const FRAMERATE_FPS: u64 = 20;
-const TOLERANCE: f32 = 0.3;
+const CIRCLE_TOLERANCE: f32 = 0.25;
+const TOLERANCE_GENERAL: f32 = 0.25;
+const LINE_TOLERANCE_PX: f32 = 100.0;
 
 fn get_mouse_position() -> Coordinate {
     let position = Mouse::get_mouse_position();
@@ -45,7 +49,7 @@ fn centroids_of_triangles(triangles: Triangles) -> Vec<Coordinate> {
     results
 }
 
-#[derive(Clone, Default, PartialEq)]
+#[derive(Clone, Default, PartialEq, Copy)]
 struct Coordinate {
     x: i32,
     y: i32,
@@ -76,6 +80,7 @@ enum RecordingStatus {
 enum ShapeName {
     Circle,
     Ellipse,
+    Line,
     Unknown,
     Undefined,
 }
@@ -115,7 +120,6 @@ impl Recording {
         self.running = false;
         self.stop_coordinate = get_mouse_position();
         self.coordinate_unchanged_cycles = 0;
-        
     }
 
     fn update(&mut self) -> RecordingStatus {
@@ -156,17 +160,71 @@ impl Coordinate {
         distance = distance;
         distance
     }
+
+    fn abs(&self) -> f32 {
+        (((self.x.pow(2))+(self.y.pow(2))) as f32 ).sqrt()
+    }
+
+    fn distance_line(self, b: Coordinate, c: Coordinate) -> f32 {
+        let a: Coordinate = self;
+        let vector_ab: Coordinate = a-b;
+        let vector_ac: Coordinate = a-c;
+        ((vector_ab.x*vector_ac.y-vector_ab.y*vector_ac.x) as f32).abs()/(b-c).abs() as f32
+    }
+}
+
+impl Sub for Coordinate {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self::Output {
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+        }
+    }
+}
+
+impl Add for Coordinate {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self::Output {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
 }
 
 impl Shape {
     fn get_shape_name(&self) -> ShapeName {
         
-        let passes: i32 = self.get_center_distances().passes_percent;
-        if self.get_center_distances().passes_percent >= 100 - (TOLERANCE * 100.0) as i32 {
-            println!("CIRCLE");
+        let passes_percent_circle: i32 = self.get_center_distances().passes_percent;
+        let passed_percent_line: f32;
+        let max_distance: i32 = self.get_distances().max;
+        let start_end_distance: i32 = self.coordinates[0].distance(&self.coordinates[self.coordinates.len()-1]);
+        if self.get_center_distances().passes_percent >= 100 - (TOLERANCE_GENERAL * 100.0) as i32 {
+            println!("CIRCLE ({}%)", passes_percent_circle);
             ShapeName::Circle
+        } else if max_distance == start_end_distance {
+            let zero: Coordinate = self.coordinates[0];
+            let zfro: Coordinate = self.coordinates[self.coordinates.len()-1];
+            let mut passed_coordinates: Vec<&Coordinate> = Vec::new();
+            for coordinate in &self.coordinates {
+                let distance: f32 = coordinate.distance_line(self.coordinates[0], self.coordinates[self.coordinates.len()-1]);
+                if distance <= LINE_TOLERANCE_PX {
+                    passed_coordinates.push(coordinate);
+                }
+            }
+            passed_percent_line = (self.coordinates.len() as f32) / (self.coordinates.len() as f32) * 100.0;
+            if passed_percent_line >= TOLERANCE_GENERAL {
+                println!("LINE ({}%)", passed_percent_line);
+                ShapeName::Line
+            } else {
+                println!("UNKNOWN ({}% Line)", passed_percent_line);
+                ShapeName::Unknown
+            }
         } else {
-            println!("UNKNOWN");
+            println!("UNKNOWN ({}% Circle)", passes_percent_circle);
             ShapeName::Unknown
         }
     }
@@ -219,7 +277,7 @@ impl Shape {
             }
         }
         average = average / self.coordinates.len() as i32;
-        let absolute_tolerance: i32 = (average as f32 * TOLERANCE) as i32;
+        let absolute_tolerance: i32 = (average as f32 * CIRCLE_TOLERANCE) as i32;
         let mut above: i32 = 0;
         let mut below: i32 = 0;
         for distance in &distances {
