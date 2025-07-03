@@ -3,7 +3,7 @@ use std::{thread, time};
 
 const END_FIGURE_TIMEOUT: u8 = 5;
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, PartialEq)]
 struct Coordinate {
     x: i32,
     y: i32,
@@ -33,10 +33,17 @@ enum RecordingStatus {
     Finished,
 }
 
-impl Coordinate {
-    fn equals(&mut self, other: &Coordinate) -> bool {
-        self.x == other.x && self.y == other.y
-    }
+#[derive(Clone, PartialEq)]
+enum ShapeName {
+    Circle,
+    Ellipse,
+    Unknown,
+}
+
+#[derive(Clone, PartialEq)]
+struct Shape {
+    coordinates: Vec<Coordinate>,
+    shape_type: ShapeName,
 }
 
 impl Recording {
@@ -59,7 +66,7 @@ impl Recording {
             println!("Initialized recording.");
         }
         let current_mouse_coordinate: Coordinate = get_mouse_position();
-        if !self.stop_coordinate.equals(&current_mouse_coordinate) {
+        if !(self.stop_coordinate == current_mouse_coordinate) {
             self.running = true;
             self.coordinates.push(current_mouse_coordinate.clone());
             self.length += 1;
@@ -86,15 +93,33 @@ impl Recording {
     }
 }
 
+impl Shape {
+    fn get_shape_name(&mut self) -> ShapeName {
+        ShapeName::Unknown
+    }
+
+    fn find_centroid(&mut self) -> Coordinate {
+        Coordinate { x: 0, y: 0 }
+    }
+}
+
 fn main() {
     let mut recording: Recording = Recording::default();
-    let mut shape_collection: Vec<Recording> = Vec::new();
+    let mut shape_collection: Vec<Shape> = Vec::new();
     loop {
-        match recording.update() {
-            RecordingStatus::Finished => shape_collection.push(recording.clone()),
-            _ => (),
+        loop {
+            match recording.update() {
+                RecordingStatus::Finished => break,
+                _ => (),
+            }
+            thread::sleep(time::Duration::from_millis(100));
         }
-        thread::sleep(time::Duration::from_millis(100));
+        shape_collection.push(Shape { coordinates: recording.coordinates.clone(), shape_type: ShapeName::Unknown });
+        for shape in &mut shape_collection {
+            if shape.shape_type == ShapeName::Unknown {
+                shape.get_shape_name();
+            }
+        }
     }
 }
 
