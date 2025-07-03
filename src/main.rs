@@ -7,7 +7,7 @@ const END_FIGURE_TIMEOUT: u8 = 5;
 const FRAMERATE_FPS: u64 = 20;
 const CIRCLE_TOLERANCE: f32 = 0.25;
 const TOLERANCE_GENERAL: f32 = 0.25;
-const LINE_TOLERANCE_PX: f32 = 100.0;
+const LINE_TOLERANCE_PX: f32 = 15.0;
 
 fn get_mouse_position() -> Coordinate {
     let position = Mouse::get_mouse_position();
@@ -215,12 +215,12 @@ impl Shape {
                     passed_coordinates.push(coordinate);
                 }
             }
-            passed_percent_line = (self.coordinates.len() as f32) / (self.coordinates.len() as f32) * 100.0;
-            if passed_percent_line >= TOLERANCE_GENERAL {
-                println!("LINE ({}%)", passed_percent_line);
+            passed_percent_line = (passed_coordinates.len() as f32) / (self.coordinates.len() as f32) * 100.0;
+            if passed_percent_line >= 100.0 - (100.0 * TOLERANCE_GENERAL) {
+                println!("LINE ({}%)", passed_percent_line as i32);
                 ShapeName::Line
             } else {
-                println!("UNKNOWN ({}% Line)", passed_percent_line);
+                println!("UNKNOWN ({}% Line)", passed_percent_line as i32);
                 ShapeName::Unknown
             }
         } else {
