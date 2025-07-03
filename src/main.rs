@@ -3,14 +3,6 @@ use std::{thread, time};
 
 const END_FIGURE_TIMEOUT: u8 = 5;
 
-fn summation(start: i32, end: i32) {
-    let mut sum: i32 = 0;
-    for i in start..end+1 {
-        sum += 3*i-1;
-    }
-    println!("{}", sum);
-}
-
 fn get_mouse_position() -> Coordinate {
     let position = Mouse::get_mouse_position();
     match position {
@@ -32,7 +24,6 @@ struct Recording {
     running: bool,
     stop_coordinate: Coordinate,
     coordinate_unchanged_cycles: u8,
-    length: u32,
 }
 
 enum RecordingStatus {
@@ -64,7 +55,6 @@ impl Recording {
         self.running = false;
         self.stop_coordinate = get_mouse_position();
         self.coordinate_unchanged_cycles = 0;
-        self.length = 0;
         
     }
 
@@ -77,9 +67,8 @@ impl Recording {
         if !(self.stop_coordinate == current_mouse_coordinate) {
             self.running = true;
             self.coordinates.push(current_mouse_coordinate.clone());
-            self.length += 1;
             self.stop_coordinate = current_mouse_coordinate;
-            if self.length == 1 {
+            if self.coordinates.len() == 0 {
                 println!("Recording started.");
             }
             RecordingStatus::Running
@@ -101,13 +90,58 @@ impl Recording {
     }
 }
 
+impl Coordinate {
+    fn distance(self, other: Coordinate) -> f32 {
+        (((self.x-other.x).pow(2)+(self.y-other.y).pow(2)) as f32).sqrt()
+    }
+}
+
 impl Shape {
     fn get_shape_name(&mut self) -> ShapeName {
-        summation(2, 3);
         ShapeName::Unknown
     }
 
-    fn find_centroid(&mut self) -> Coordinate {
+    fn find_center(self) -> Coordinate {
+        fn summation(start: i32, end: i32) -> Result {
+            if start <= end {
+                let mut sum: i32 = 0;
+                let mut i: i32 = start.clone();
+                while i <= end {
+                    sum += 3*i-1;
+                    i += 1;
+                }
+                Result {value: sum, ok: true}
+            } else {
+                Result {value: 0, ok: false}
+            }
+        }
+
+        let mut a: Vec<Coordinate> = Vec::new();
+        let mut b: Vec<Coordinate> = Vec::new();
+        let mut c: Vec<Coordinate> = Vec::new();
+        let mut n: u8 = 1;
+        for coordinate in self.coordinates.clone() {
+            if a.len()+b.len()+c.len()+3 <= self.coordinates.len() {
+                match n {
+                    1 => a.push(coordinate),
+                    2 => b.push(coordinate),
+                    3 => c.push(coordinate),
+                    _ => ()
+                }
+                n += 1;
+                if n > 3 {
+                    n = 1;
+                }
+            }
+        }
+
+        
+
+        struct Result {
+            value: i32,
+            ok: bool,
+        }
+
         Coordinate { x: 0, y: 0 }
     }
 }
