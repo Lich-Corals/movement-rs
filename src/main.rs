@@ -1,14 +1,16 @@
 use mouse_position::mouse_position::{Mouse};
 use std::path::absolute;
+use std::thread::current;
 use std::{thread, time};
 use std::ops::{Sub, Add, Div, Mul};
 
 const END_FIGURE_TIMEOUT: u8 = 5;
 const FRAMERATE_FPS: u64 = 20;
-const CIRCLE_TOLERANCE: f32 = 0.25;
 const TOLERANCE_GENERAL: f32 = 0.25;
+const CIRCLE_TOLERANCE: f32 = 0.25;
 const LINE_TOLERANCE_PX: f32 = 10.0;
 const ELLIPSE_CENTRUM_TOLERANCE_PX: i32 = 100;
+const ELLIPSE_TOLERANCE: f32 = 0.5;
 
 fn get_mouse_position() -> Coordinate {
     let position = Mouse::get_mouse_position();
@@ -97,10 +99,11 @@ struct DistanceSet {
     min: i32,
     max: i32,
     max_pair: [Coordinate; 2],
+    min_pair: [Coordinate; 2],
 }
 
 #[derive(Clone, PartialEq)]
-struct CenterDistanceSet {
+struct PointDistanceSet {
     min: i32,
     max: i32,
     avg: i32,
@@ -108,6 +111,8 @@ struct CenterDistanceSet {
     below: i32,
     values: i32,
     passes_percent: i32,
+    max_pair: [Coordinate; 2],
+    min_pair: [Coordinate; 2],
 }
 
 impl Recording {
@@ -173,7 +178,14 @@ impl Coordinate {
     }
 
     fn angle(self, other: Coordinate) -> f32 {
-        ((self * other).abs() as f32 / (self.abs() * other.abs())).acos()
+        (((self * other) as f32) / (self.abs() * other.abs())).abs().acos().to_degrees()
+    }
+
+    fn positive(self) -> Self {
+        Self {
+            x: self.x.abs(),
+            y: self.y.abs(),
+        }
     }
 }
 
@@ -232,7 +244,6 @@ impl Mul for Coordinate {
 
 impl Shape {
     fn get_shape_name(&self) -> ShapeName {
-        
         let passes_percent_circle: i32 = self.get_point_distances(self.find_center()).passes_percent;
         let passed_percent_line: f32;
         let max_distance: i32 = self.get_distances().max;
@@ -262,14 +273,48 @@ impl Shape {
             let vector_centrum: Coordinate = longest_vector / 2;
             let calculated_centrum: Coordinate = self.find_center();
             if (calculated_centrum - vector_centrum).abs() as i32 <= ELLIPSE_CENTRUM_TOLERANCE_PX {
-                let closest_point_tuple: (Coordinate, i32) = self.get_closest_to_point(vector_centrum);
-
-
-
-                println!("ELLIPSE ({}%)", passes_percent_circle);
-                ShapeName::Ellipse
+                let check_point_amount: i32 = (self.coordinates.len()/2) as i32;
+                let mut last_distance: f32 = f32::MAX;
+                let mut grow: f32 = 0.0;
+                let mut shrink: f32 = 0.0;
+                let check_vectors: [Coordinate; 2] = [(calculated_centrum - max_pair[1]) / check_point_amount, (calculated_centrum - max_pair[0]) / check_point_amount];
+                let mut distance_errors: f32 = 0.0;
+                let mut distance_passed: f32 = 0.0;
+                let mut current_check_vector: Coordinate;
+                for ii in 0..1 {
+                    for i in 1..check_point_amount {
+                        current_check_vector = vector_centrum + (check_vectors[ii] * i);
+                        let distance_min: f32 = self.get_closest_to_point(current_check_vector).0.distance_line(max_pair[0], max_pair[1]).abs();
+                        let point_min: Coordinate = self.get_closest_to_point(current_check_vector).0;
+                        let mirrored_min: Coordinate = current_check_vector + (current_check_vector - point_min) * 2;
+                        let mirrored_min_distance: f32 = self.get_closest_to_point(mirrored_min).0.distance_line(max_pair[0], max_pair[1]).abs();
+                        let difference = mirrored_min_distance / distance_min;
+                        if mirrored_min_distance - ELLIPSE_TOLERANCE * distance_min > distance_min || mirrored_min_distance + ELLIPSE_TOLERANCE * distance_min < distance_min {
+                            distance_errors += 1.0;
+                        } else {
+                            distance_passed += 1.0;
+                        }
+                        if distance_min > last_distance {
+                            
+                            grow += 1.0;
+                        } else {
+                            shrink += 1.0;
+                        }
+                        last_distance = self.get_point_distances(check_vectors[ii] * i).min as f32;
+                    }
+                }
+                let grow_factor: f32 = grow / (shrink + grow);
+                let distance_error_factor: f32 = distance_errors / (distance_passed + distance_errors);
+                let perfection: f32 = (grow_factor + distance_error_factor) / 2.0;
+                if perfection > TOLERANCE_GENERAL {
+                    println!("UNKNOWN ({}% Ellipse)", ((1.0 - perfection) * 100.0) as i32);
+                    ShapeName::Unknown
+                } else {
+                    println!("ELLIPSE ({}%)", ((1.0 - perfection) * 100.0) as i32);
+                    ShapeName::Ellipse
+                }
             } else {
-                println!("UNKNOWN ({}% CIRCLE)", passes_percent_circle);
+                println!("UNKNOWN ({}% Circle)", passes_percent_circle);
                 ShapeName::Unknown
             }
         }
@@ -304,6 +349,7 @@ impl Shape {
         let mut max_distance: i32 = 0;
         let mut min_distance: i32 = i32::MAX;
         let mut max_pair: [Coordinate; 2] = [Coordinate::default(), Coordinate::default()];
+        let mut min_pair:[Coordinate; 2] = max_pair.clone();
         for point in &self.coordinates {
             for other in &self.coordinates {
                 if point != other {
@@ -313,18 +359,21 @@ impl Shape {
                         max_pair = [*point, *other];
                     } else if new_distance < min_distance {
                         min_distance = new_distance;
+                        min_pair = [*point, *other];
                     }
                 }
             }
         }
-        DistanceSet { min: min_distance, max: max_distance, max_pair: max_pair }
+        DistanceSet { min: min_distance, max: max_distance, max_pair: max_pair, min_pair: min_pair }
     }
 
-    fn get_point_distances(&self, point: Coordinate) -> CenterDistanceSet {
+    fn get_point_distances(&self, point: Coordinate) -> PointDistanceSet {
         let mut max_distance: i32 = 0;
         let mut min_distance: i32 = i32::MAX;
         let mut average: i32 = 0;
         let mut distances: Vec<i32> = Vec::new();
+        let mut max_pair: [Coordinate; 2] = [Coordinate::default(), Coordinate::default()];
+        let mut min_pair:[Coordinate; 2] = max_pair.clone();
         for other in &self.coordinates {
             if point != *other {
                 let new_distance: i32 = point.distance(other);
@@ -332,8 +381,10 @@ impl Shape {
                 distances.push(new_distance);
                 if new_distance > max_distance {
                     max_distance = new_distance;
+                    max_pair = [point, *other];
                 } if new_distance < min_distance {
                     min_distance = new_distance;
+                    min_pair = [point, *other];
                 }
             }
         }
@@ -350,7 +401,7 @@ impl Shape {
             }
         }
         let passed: i32 = self.coordinates.len() as i32 - (above + below);
-        CenterDistanceSet { min: min_distance, max: max_distance, avg: average, above: above, below: below, values: self.coordinates.len() as i32, passes_percent: ((passed as f32) / (self.coordinates.len() as f32) * 100.0) as i32}
+        PointDistanceSet { min: min_distance, max: max_distance, avg: average, above: above, below: below, values: self.coordinates.len() as i32, passes_percent: ((passed as f32) / (self.coordinates.len() as f32) * 100.0) as i32, max_pair: max_pair, min_pair: min_pair}
     }
 }
 
