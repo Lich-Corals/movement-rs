@@ -89,14 +89,13 @@ enum ShapeName {
 struct Shape {
     coordinates: Vec<Coordinate>,
     shape_type: ShapeName,
-    distances: DistanceSet,
-}
+ }
 
 #[derive(Clone, PartialEq)]
 struct DistanceSet {
     min: i32,
     max: i32,
-    minimax: i32,
+    max_pair: [Coordinate; 2],
 }
 
 #[derive(Clone, PartialEq)]
@@ -111,10 +110,6 @@ struct CenterDistanceSet {
 }
 
 impl Recording {
-    fn clear(&mut self) {
-        self.coordinates = Vec::new();
-    }
-
     fn init(&mut self) {
         self.initialized = true;
         self.running = false;
@@ -206,8 +201,6 @@ impl Shape {
             println!("CIRCLE ({}%)", passes_percent_circle);
             ShapeName::Circle
         } else if max_distance == start_end_distance {
-            let zero: Coordinate = self.coordinates[0];
-            let zfro: Coordinate = self.coordinates[self.coordinates.len()-1];
             let mut passed_coordinates: Vec<&Coordinate> = Vec::new();
             for coordinate in &self.coordinates {
                 let distance: f32 = coordinate.distance_line(self.coordinates[0], self.coordinates[self.coordinates.len()-1]);
@@ -243,19 +236,21 @@ impl Shape {
     fn get_distances(&self) -> DistanceSet {
         let mut max_distance: i32 = 0;
         let mut min_distance: i32 = i32::MAX;
+        let mut max_pair: [Coordinate; 2] = [Coordinate::default(), Coordinate::default()];
         for point in &self.coordinates {
             for other in &self.coordinates {
                 if point != other {
                     let new_distance: i32 = point.distance(other);
                     if new_distance > max_distance {
                         max_distance = new_distance;
+                        max_pair = [*point, *other];
                     } else if new_distance < min_distance {
                         min_distance = new_distance;
                     }
                 }
             }
         }
-        DistanceSet { min: min_distance, max: max_distance, minimax: (min_distance+max_distance)/2 }
+        DistanceSet { min: min_distance, max: max_distance, max_pair: max_pair }
     }
 
     fn get_center_distances(&self) -> CenterDistanceSet {
@@ -304,11 +299,10 @@ fn main() {
             }
             thread::sleep(time::Duration::from_millis(1000/FRAMERATE_FPS));
         }
-        shape_collection.push(Shape { coordinates: recording.coordinates.clone(), shape_type: ShapeName::Undefined, distances: DistanceSet {min: 0, max: 0, minimax: 0}});
+        shape_collection.push(Shape { coordinates: recording.coordinates.clone(), shape_type: ShapeName::Undefined});
         for shape in &mut shape_collection {
             if shape.shape_type == ShapeName::Undefined {
                 shape.shape_type = shape.get_shape_name();
-                shape.distances = shape.get_distances();
             }
         }
         recording = Recording::default();
