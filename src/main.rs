@@ -1,6 +1,4 @@
 use mouse_position::mouse_position::{Mouse};
-use std::path::absolute;
-use std::thread::current;
 use std::{thread, time};
 use std::ops::{Sub, Add, Div, Mul};
 
@@ -20,38 +18,6 @@ fn get_mouse_position() -> Coordinate {
     }
 }
 
-fn divide_into_triangles(points: &Vec<Coordinate>) -> Triangles {
-    let mut a: Vec<Coordinate> = Vec::new();
-    let mut b: Vec<Coordinate> = Vec::new();
-    let mut c: Vec<Coordinate> = Vec::new();
-    let mut n: u8 = 1;
-    for coordinate in points.clone() {
-        if a.len()+b.len()+c.len()+3 <= points.len() {
-            match n {
-                1 => a.push(coordinate),
-                2 => b.push(coordinate),
-                3 => c.push(coordinate),
-                _ => ()
-            }
-            n += 1;
-            if n > 3 {
-                n = 1;
-            }
-        }
-    }
-    Triangles { a: a, b: b, c: c }   
-}
-
-fn centroids_of_triangles(triangles: Triangles) -> Vec<Coordinate> {
-    let mut results: Vec<Coordinate> = Vec::new();
-    for i in 0..triangles.a.len() {
-        let x = triangles.a[i].x;
-        let y = triangles.a[i].y;
-        results.push(Coordinate { x: x, y: y });
-    }
-    results
-}
-
 #[derive(Clone, Default, PartialEq, Copy)]
 struct Coordinate {
     x: i32,
@@ -66,12 +32,6 @@ struct Recording {
     stop_coordinate: Coordinate,
     coordinate_unchanged_cycles: u8,
 }
-
-struct Triangles {
-        a: Vec<Coordinate>,
-        b: Vec<Coordinate>,
-        c: Vec<Coordinate>,
-    }
 
 enum RecordingStatus {
     Waiting,
@@ -176,17 +136,6 @@ impl Coordinate {
         let vector_ac: Coordinate = a-c;
         (vector_ab.cross(vector_ac) as f32)/(b-c).abs() as f32
     }
-
-    fn angle(self, other: Coordinate) -> f32 {
-        (((self * other) as f32) / (self.abs() * other.abs())).abs().acos().to_degrees()
-    }
-
-    fn positive(self) -> Self {
-        Self {
-            x: self.x.abs(),
-            y: self.y.abs(),
-        }
-    }
 }
 
 impl Sub for Coordinate {
@@ -288,7 +237,6 @@ impl Shape {
                         let point_min: Coordinate = self.get_closest_to_point(current_check_vector).0;
                         let mirrored_min: Coordinate = current_check_vector + (current_check_vector - point_min) * 2;
                         let mirrored_min_distance: f32 = self.get_closest_to_point(mirrored_min).0.distance_line(max_pair[0], max_pair[1]).abs();
-                        let difference = mirrored_min_distance / distance_min;
                         if mirrored_min_distance - ELLIPSE_TOLERANCE * distance_min > distance_min || mirrored_min_distance + ELLIPSE_TOLERANCE * distance_min < distance_min {
                             distance_errors += 1.0;
                         } else {
