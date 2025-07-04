@@ -103,7 +103,6 @@ impl Recording {
                 if self.coordinate_unchanged_cycles >= END_FIGURE_TIMEOUT {
                     self.initialized = false;
                     self.stop_coordinate = get_mouse_position();
-                    println!("Recording finished.");
                     RecordingStatus::Finished
                 } else {
                     RecordingStatus::Running
@@ -354,6 +353,20 @@ impl Shape {
 }
 
 fn main() {
+    println!("                   .-'''-.                                                                                        ");
+    println!("                  '   _    \\                                                                                      ");
+    println!(" __  __   ___   /   /` '.   .----.     .----.  __.....__     __  __   ___        __.....__       _..._            ");
+    println!("|  |/  `.'   `..   |     \\  '\\    \\   /    .-''         '.  |  |/  `.'   `.  .-''         '.   .'     '.       TM ");
+    println!("|   .-.  .-.   |   '      |  ''   '. /'   /     .-''''-.  `.|   .-.  .-.   '/     .-''''-.  `..   .-.   .    .|   ");
+    println!("|  |  |  |  |  \\    \\     / / |    |'    /     /________\\   |  |  |  |  |  /     /________\\   |  '   '  |  .' |_  ");
+    println!("|  |  |  |  |  |`.   ` ..' /  |    ||    |                  |  |  |  |  |  |                  |  |   |  |.'     | ");
+    println!("|  |  |  |  |  |   '-...-'`   '.   `'   .\\    .-------------|  |  |  |  |  \\    .-------------|  |   |  '--.  .-' ");
+    println!("|  |  |  |  |  |               \\        / \\    '-.____...---|  |  |  |  |  |\\    '-.____...---|  |   |  |  |  |   ");
+    println!("|__|  |__|  |__|                \\      /   `.             .'|__|  |__|  |__| `.             .'|  |   |  |  |  |   ");
+    println!("                                 '----'      `''-...... -'                     `''-...... -'  |  |   |  |  |  '.' ");
+    println!("                                                                                              |  |   |  |  |   /  ");
+    println!("More or less accurate shape recognition                                                       '--'   '--'  `'-'   ");
+    println!("");
     let mut recording: Recording = Recording::default();
     let mut shape_collection: Vec<Shape> = Vec::new();
     loop {
