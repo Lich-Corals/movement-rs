@@ -1,13 +1,14 @@
 use mouse_position::mouse_position::{Mouse};
 use std::path::absolute;
 use std::{thread, time};
-use std::ops::{Sub, Add};
+use std::ops::{Sub, Add, Div, Mul};
 
 const END_FIGURE_TIMEOUT: u8 = 5;
 const FRAMERATE_FPS: u64 = 20;
 const CIRCLE_TOLERANCE: f32 = 0.25;
 const TOLERANCE_GENERAL: f32 = 0.25;
-const LINE_TOLERANCE_PX: f32 = 15.0;
+const LINE_TOLERANCE_PX: f32 = 10.0;
+const ELLIPSE_CENTRUM_TOLERANCE_PX: i32 = 100;
 
 fn get_mouse_position() -> Coordinate {
     let position = Mouse::get_mouse_position();
@@ -150,21 +151,29 @@ impl Recording {
 }
 
 impl Coordinate {
+    fn abs(&self) -> f32 {
+        (((self.x.pow(2))+(self.y.pow(2))) as f32 ).sqrt()
+    }
+
+    fn cross(self, other: Coordinate) -> i32 {
+        self.x * other.y - self.y * other.x
+    }
+
     fn distance(&self, other: &Coordinate) -> i32 {
         let mut distance = (((self.x-other.x).pow(2)+(self.y-other.y).pow(2)) as f32).sqrt() as i32;
         distance = distance;
         distance
     }
 
-    fn abs(&self) -> f32 {
-        (((self.x.pow(2))+(self.y.pow(2))) as f32 ).sqrt()
-    }
-
     fn distance_line(self, b: Coordinate, c: Coordinate) -> f32 {
         let a: Coordinate = self;
         let vector_ab: Coordinate = a-b;
         let vector_ac: Coordinate = a-c;
-        ((vector_ab.x*vector_ac.y-vector_ab.y*vector_ac.x) as f32).abs()/(b-c).abs() as f32
+        (vector_ab.cross(vector_ac) as f32)/(b-c).abs() as f32
+    }
+
+    fn angle(self, other: Coordinate) -> f32 {
+        ((self * other).abs() as f32 / (self.abs() * other.abs())).acos()
     }
 }
 
@@ -190,14 +199,45 @@ impl Add for Coordinate {
     }
 }
 
+impl Div<i32> for Coordinate {
+    type Output = Self;
+
+    fn div(self, other: i32) -> Self::Output {
+        Self {
+            x: self.x / other,
+            y: self.y / other,
+        }
+    }
+}
+
+impl Mul<i32> for Coordinate {
+    type Output = Self;
+
+    fn mul(self, other: i32) -> Self::Output {
+        Self {
+            x: self.x * other,
+            y: self.y * other,
+        }
+    }
+}
+
+impl Mul for Coordinate {
+    type Output = i32;
+
+    fn mul(self, other: Self) -> Self::Output {
+        self.x * other.x + self.y * self.y
+    }
+
+}
+
 impl Shape {
     fn get_shape_name(&self) -> ShapeName {
         
-        let passes_percent_circle: i32 = self.get_center_distances().passes_percent;
+        let passes_percent_circle: i32 = self.get_point_distances(self.find_center()).passes_percent;
         let passed_percent_line: f32;
         let max_distance: i32 = self.get_distances().max;
         let start_end_distance: i32 = self.coordinates[0].distance(&self.coordinates[self.coordinates.len()-1]);
-        if self.get_center_distances().passes_percent >= 100 - (TOLERANCE_GENERAL * 100.0) as i32 {
+        if self.get_point_distances(self.find_center()).passes_percent >= 100 - (TOLERANCE_GENERAL * 100.0) as i32 {
             println!("CIRCLE ({}%)", passes_percent_circle);
             ShapeName::Circle
         } else if max_distance == start_end_distance {
@@ -217,8 +257,21 @@ impl Shape {
                 ShapeName::Unknown
             }
         } else {
-            println!("UNKNOWN ({}% Circle)", passes_percent_circle);
-            ShapeName::Unknown
+            let max_pair: [Coordinate; 2] = self.get_distances().max_pair;
+            let longest_vector: Coordinate = max_pair[0] + max_pair[1];
+            let vector_centrum: Coordinate = longest_vector / 2;
+            let calculated_centrum: Coordinate = self.find_center();
+            if (calculated_centrum - vector_centrum).abs() as i32 <= ELLIPSE_CENTRUM_TOLERANCE_PX {
+                let closest_point_tuple: (Coordinate, i32) = self.get_closest_to_point(vector_centrum);
+
+
+
+                println!("ELLIPSE ({}%)", passes_percent_circle);
+                ShapeName::Ellipse
+            } else {
+                println!("UNKNOWN ({}% CIRCLE)", passes_percent_circle);
+                ShapeName::Unknown
+            }
         }
     }
 
@@ -231,6 +284,20 @@ impl Shape {
         average_coordinate.x = average_coordinate.x / self.coordinates.len() as i32;
         average_coordinate.y = average_coordinate.y / self.coordinates.len() as i32;
         average_coordinate
+    }
+
+    fn get_closest_to_point(&self, point: Coordinate) -> (Coordinate, i32) {
+        let mut min_distance: i32 = i32::MAX;
+        let mut min_distance_point: Coordinate = Coordinate::default();
+        for other in &self.coordinates {
+            if other != &point {
+                if point.distance(other) < min_distance {
+                    min_distance = point.distance(other);
+                    min_distance_point = *other;
+                }
+            }
+        }
+        (min_distance_point, min_distance)
     }
 
     fn get_distances(&self) -> DistanceSet {
@@ -253,15 +320,14 @@ impl Shape {
         DistanceSet { min: min_distance, max: max_distance, max_pair: max_pair }
     }
 
-    fn get_center_distances(&self) -> CenterDistanceSet {
-        let center: Coordinate = self.find_center();
+    fn get_point_distances(&self, point: Coordinate) -> CenterDistanceSet {
         let mut max_distance: i32 = 0;
         let mut min_distance: i32 = i32::MAX;
         let mut average: i32 = 0;
         let mut distances: Vec<i32> = Vec::new();
         for other in &self.coordinates {
-            if center != *other {
-                let new_distance: i32 = center.distance(other);
+            if point != *other {
+                let new_distance: i32 = point.distance(other);
                 average += new_distance;
                 distances.push(new_distance);
                 if new_distance > max_distance {
