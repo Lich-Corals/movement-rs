@@ -426,9 +426,11 @@ mod tests {
 
     #[test]
     fn test_line() {
-        let example_line_coordinates: Vec<Vector2D> = vec![Vector2D { x: 3659, y: 919 }, Vector2D { x: 3655, y: 919 }, Vector2D { x: 3654, y: 919 }, Vector2D { x: 3651, y: 919 }, Vector2D { x: 3645, y: 919 }, Vector2D { x: 3625, y: 919 }, Vector2D { x: 3609, y: 920 }, Vector2D { x: 3587, y: 920 }, Vector2D { x: 3565, y: 921 }, Vector2D { x: 3538, y: 923 }, Vector2D { x: 3520, y: 924 }, Vector2D { x: 3496, y: 924 }, Vector2D { x: 3475, y: 924 }, Vector2D { x: 3448, y: 924 }, Vector2D { x: 3418, y: 922 }, Vector2D { x: 3391, y: 921 }, Vector2D { x: 3361, y: 921 }, Vector2D { x: 3333, y: 921 }, Vector2D { x: 3305, y: 921 }, Vector2D { x: 3283, y: 920 }, Vector2D { x: 3258, y: 919 }, Vector2D { x: 3237, y: 919 }, Vector2D { x: 3211, y: 918 }, Vector2D { x: 3190, y: 917 }, Vector2D { x: 3164, y: 916 }, Vector2D { x: 3138, y: 916 }, Vector2D { x: 3111, y: 918 }, Vector2D { x: 3084, y: 919 }, Vector2D { x: 3052, y: 922 }, Vector2D { x: 3029, y: 923 }, Vector2D { x: 2999, y: 924 }, Vector2D { x: 2970, y: 925 }, Vector2D { x: 2935, y: 926 }, Vector2D { x: 2911, y: 927 }, Vector2D { x: 2892, y: 927 }, Vector2D { x: 2883, y: 928 }, Vector2D { x: 2878, y: 928 }];
-        let test_shape: Shape = Shape { coordinates: example_line_coordinates, shape_type: ShapeName::Undefined };
-        assert_eq!(test_shape.get_shape_name(), ShapeName::Line);
+        let example_line_coordinates_vec: Vec<Vec<Vector2D>> = vec![vec![Vector2D { x: 3659, y: 919 }, Vector2D { x: 3655, y: 919 }, Vector2D { x: 3654, y: 919 }, Vector2D { x: 3651, y: 919 }, Vector2D { x: 3645, y: 919 }, Vector2D { x: 3625, y: 919 }, Vector2D { x: 3609, y: 920 }, Vector2D { x: 3587, y: 920 }, Vector2D { x: 3565, y: 921 }, Vector2D { x: 3538, y: 923 }, Vector2D { x: 3520, y: 924 }, Vector2D { x: 3496, y: 924 }, Vector2D { x: 3475, y: 924 }, Vector2D { x: 3448, y: 924 }, Vector2D { x: 3418, y: 922 }, Vector2D { x: 3391, y: 921 }, Vector2D { x: 3361, y: 921 }, Vector2D { x: 3333, y: 921 }, Vector2D { x: 3305, y: 921 }, Vector2D { x: 3283, y: 920 }, Vector2D { x: 3258, y: 919 }, Vector2D { x: 3237, y: 919 }, Vector2D { x: 3211, y: 918 }, Vector2D { x: 3190, y: 917 }, Vector2D { x: 3164, y: 916 }, Vector2D { x: 3138, y: 916 }, Vector2D { x: 3111, y: 918 }, Vector2D { x: 3084, y: 919 }, Vector2D { x: 3052, y: 922 }, Vector2D { x: 3029, y: 923 }, Vector2D { x: 2999, y: 924 }, Vector2D { x: 2970, y: 925 }, Vector2D { x: 2935, y: 926 }, Vector2D { x: 2911, y: 927 }, Vector2D { x: 2892, y: 927 }, Vector2D { x: 2883, y: 928 }, Vector2D { x: 2878, y: 928 }], vec![Vector2D { x: 5, y: 5}, Vector2D { x: 10, y: 5}, Vector2D { x: 15, y: 5}]];
+        for line_coordinates in example_line_coordinates_vec {
+            let test_shape: Shape = Shape { coordinates: line_coordinates, shape_type: ShapeName::Undefined };
+            assert_eq!(test_shape.get_shape_name(), ShapeName::Line);
+        }
     }
 
     #[test]
