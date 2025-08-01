@@ -9,6 +9,9 @@ I'm not very familiar with the mathematical principles normally used to identify
 If you happen to have a bit of time to spare to improve the program, you're welcome to do so and submit a pull-request and explain what you've done.
 There are a few tests at the end of the file to check if pre recorded shpes are recognized as the correct shape. Those tests are also connected with a github action, which should automatically run if a pull-request is submitted.
 
+## How does it work?
+I explained this in detail in the [feature guide](https://github.com/Lich-Corals/movement-rs/blob/mistress/latex/feature_guide.pdf).
+
 ## How to use it?
 1. Install Cargo (the package manager for rust)
 2. download the project (using git) and cd into the directory:
