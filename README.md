@@ -7,6 +7,7 @@ A small project I created to get more familiar with Rust. It is not designed to 
 I'm not very familiar with the mathematical principles normally used to identify shapes from mere coordinate sets. Thus, this is just an attempt of determining which shape has been drawn using my limited knowledge.
 
 If you happen to have a bit of time to spare to improve the program, you're welcome to do so and submit a pull-request and explain what you've done.
+There are a few tests at the end of the file to check if pre recorded shpes are recognized as the correct shape. Those tests are also connected with a github action, which should automatically run if a pull-request is submitted.
 
 ## How to use it?
 1. Install Cargo (the package manager for rust)
