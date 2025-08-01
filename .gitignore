@@ -1,0 +1,10 @@
+target/debug
+target/.rustc_info.json
+target/rust-analyzer
+.vscode
+target/release
+latex/
+
+!.gitignore
+!latex/feature_guide.tex
+!latex/feature_guide.pdf
