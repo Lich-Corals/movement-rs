@@ -145,7 +145,7 @@ impl Vector2D {
         distance
     }
 
-    fn distance_line(self, b: Vector2D, c: Vector2D) -> f32 {
+    fn distance_to_line(self, b: Vector2D, c: Vector2D) -> f32 {
         let a: Vector2D = self;
         let vector_ab: Vector2D = a-b;
         let vector_ac: Vector2D = a-c;
@@ -218,7 +218,7 @@ impl Shape {
         } else if max_distance == start_end_distance {
             let mut passed_coordinates: Vec<&Vector2D> = Vec::new();
             for coordinate in &self.coordinates {
-                let distance: f32 = coordinate.distance_line(self.coordinates[0], self.coordinates[self.coordinates.len()-1]);
+                let distance: f32 = coordinate.distance_to_line(self.coordinates[0], self.coordinates[self.coordinates.len()-1]);
                 if distance <= LINE_TOLERANCE_PX {
                     passed_coordinates.push(coordinate);
                 }
@@ -248,10 +248,10 @@ impl Shape {
                 for ii in 0..1 {
                     for i in 1..check_point_amount {
                         current_check_vector = vector_centrum + (check_vectors[ii] * i);
-                        let distance_min: f32 = self.get_closest_to_point(current_check_vector).0.distance_line(max_pair[0], max_pair[1]).abs();
+                        let distance_min: f32 = self.get_closest_to_point(current_check_vector).0.distance_to_line(max_pair[0], max_pair[1]).abs();
                         let point_min: Vector2D = self.get_closest_to_point(current_check_vector).0;
                         let mirrored_min: Vector2D = current_check_vector + (current_check_vector - point_min) * 2;
-                        let mirrored_min_distance: f32 = self.get_closest_to_point(mirrored_min).0.distance_line(max_pair[0], max_pair[1]).abs();
+                        let mirrored_min_distance: f32 = self.get_closest_to_point(mirrored_min).0.distance_to_line(max_pair[0], max_pair[1]).abs();
                         if mirrored_min_distance - ELLIPSE_TOLERANCE * distance_min > distance_min || mirrored_min_distance + ELLIPSE_TOLERANCE * distance_min < distance_min {
                             distance_errors += 1.0;
                         } else {
