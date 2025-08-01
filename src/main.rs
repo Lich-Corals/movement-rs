@@ -1,3 +1,19 @@
+// Movement-RS - More or less accurate shape recognition 
+// Copyright (C) 2025  Linus Tibert
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 use mouse_position::mouse_position::{Mouse};
 use std::{thread, time};
 use std::ops::{Sub, Add, Div, Mul};
@@ -356,7 +372,7 @@ fn main() {
     println!("                   .-'''-.                                                                                        ");
     println!("                  '   _    \\                                                                                      ");
     println!(" __  __   ___   /   /` '.   .----.     .----.  __.....__     __  __   ___        __.....__       _..._            ");
-    println!("|  |/  `.'   `..   |     \\  '\\    \\   /    .-''         '.  |  |/  `.'   `.  .-''         '.   .'     '.       TM ");
+    println!("|  |/  `.'   `..   |     \\  '\\    \\   /    .-''         '.  |  |/  `.'   `.  .-''         '.   .'     '.          ");
     println!("|   .-.  .-.   |   '      |  ''   '. /'   /     .-''''-.  `.|   .-.  .-.   '/     .-''''-.  `..   .-.   .    .|   ");
     println!("|  |  |  |  |  \\    \\     / / |    |'    /     /________\\   |  |  |  |  |  /     /________\\   |  '   '  |  .' |_  ");
     println!("|  |  |  |  |  |`.   ` ..' /  |    ||    |                  |  |  |  |  |  |                  |  |   |  |.'     | ");
@@ -367,6 +383,8 @@ fn main() {
     println!("                                                                                              |  |   |  |  |   /  ");
     println!("More or less accurate shape recognition                                                       '--'   '--'  `'-'   ");
     println!("");
+    println!("Movement-RS  Copyright (C) 2025  Linus Tibert\nThis program comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions.\nView https://github.com/Lich-Corals/movement-rs/blob/main/LICENSE for more information.\n");
+    println!("Move your cursor to start a recording. Stop moving to evaluate.\n");
     let mut recording: Recording = Recording::default();
     let mut shape_collection: Vec<Shape> = Vec::new();
     loop {
