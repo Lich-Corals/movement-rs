@@ -1,6 +1,7 @@
 \documentclass[12pt, a4paper]{article}
 \usepackage[left=2cm, right=4cm, top=2cm, bottom=3cm]{geometry}
 \usepackage[hidelinks]{hyperref}
+\usepackage[htt]{hyphenat}
 \usepackage{tikz, circuitikz}
 \usepackage{fancyhdr}
 \usepackage{wrapfig}
@@ -14,6 +15,7 @@
 \renewcommand{\headrulewidth}{0pt}
 \fancyfoot[C]{\thepage}
 \fancyfoot[L]{\tiny\copyright\ 2025 Linus Tibert - AGPLv3 Licence}
+\fancyfoot[R]{\tiny Last update: \today}
 \fancyhead{}
 
 \begin{document}
@@ -23,13 +25,20 @@
     \pagebreak
 
     \section{Introduction}
-    This paper means to be an understandable explanation of what Movement-RS does to distinguish between a number of shapes. While it is not strictly necessary to take a look at the code while reading this, it is highly recommended for understanding the text and the code itself.
+    This paper means to be an understandable explanation of what Movement-RS does behind the scenes to record what the cursor does and to distinguish between a number of different shapes. While it is not strictly necessary to look at the code while reading this, it is highly recommended for understanding the text and the code itself.
+
+    Note that hyphenation is enabled for variable names too. This may get a little confusing, but the variables in Rust never use hyphens, so it should still be clear what the name of a mentioned variable is.
 
     \section{Recording shapes}
         \label{sec:recording}
         In this section, I will explain, how new shapes are recorded in the code. 
         
-        First of all, a new instance of the \texttt{Recording} struct is created.
+        First, a new instance of the \texttt{Recording} struct is created. The \texttt{update()} function of the \texttt{Recording} is executed periodically with an interval of $\frac{1000}{\texttt{FRAMERATE\_FPS}}$ milliseconds. When the function is executed for the first time, the \texttt{init()} function is called to prepare for a new recording. As soon as the cursor coordinate changes, the recording starts and each \texttt{update()}, or 'frame', the current cursor coordinate is added to the \texttt{coordinates} vector. Each frame, the \texttt{update()} function returns a \texttt{RecordingStatus} which tells the main function the current status.
+
+        If the coordinate does not change, 1 is added to the \texttt{coordinate\_unchanged\_cycles} property (Starting at 0 after initailization). If this property is equal to \texttt{END\_FIGURE\_TIMEOUT}, the \texttt{update()} function returns a \texttt{RecordingStatus::Finished}, telling the main function to reset the recording after moving the \texttt{coordinates} into a new \texttt{Shape} object which is pushed into the \texttt{shape\_collection}.
+
+        As soon as a new \texttt{Shape} is added to this collection, the program iterates over all objects in it and runs the \texttt{Shape.get\_shape\_name()} for those which have their \texttt{shape\_type} set to \texttt{ShapeName::Undefined}.
+
     \section{Shape detection}
         \label{sec:shape_detection}
         \subsection{Straight Lines}
@@ -113,7 +122,7 @@
         {
             \raggedright
             \subsection{Constants}
-                N.b. most of the constants are explained in section \ref{sec:shape_detection} with more detail.\break
+                N.b. most of the constants are explained in section \ref{sec:recording} and \ref{sec:shape_detection} in more detail.\break
 
                 \texttt{END\_FIGURE\_TIMEOUT} is the amount of 'frames' which have to be the same in a row for a running recording of mouse movement to get stopped and evaluated.\break
 
