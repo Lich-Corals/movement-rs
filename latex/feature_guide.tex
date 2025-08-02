@@ -13,7 +13,7 @@
 \pagestyle{fancy}
 \renewcommand{\headrulewidth}{0pt}
 \fancyfoot[C]{\thepage}
-\fancyfoot[L]{\tiny\copyright\ 2025 Linus Tibert - AGPLv3 License}
+\fancyfoot[L]{\tiny\copyright\ 2025 Linus Tibert - AGPLv3 Licence}
 \fancyhead{}
 
 \begin{document}
@@ -23,8 +23,13 @@
     \pagebreak
 
     \section{Introduction}
-    This paper is meant to be an understandable explanation of what Movement-RS does to distinguish between a number of shapes. While it is not strictly necessary to take a look at the code while reading this, it is highly recommended for understanding the text and the code itself.
+    This paper means to be an understandable explanation of what Movement-RS does to distinguish between a number of shapes. While it is not strictly necessary to take a look at the code while reading this, it is highly recommended for understanding the text and the code itself.
 
+    \section{Recording shapes}
+        \label{sec:recording}
+        In this section, I will explain, how new shapes are recorded in the code. 
+        
+        First of all, a new instance of the \texttt{Recording} struct is created.
     \section{Shape detection}
         \label{sec:shape_detection}
         \subsection{Straight Lines}
@@ -44,7 +49,7 @@
                 \caption{Line detection}
                 \label{fig:line}
             \end{wrapfigure}
-            Line detection in this program is done in a very straight forward way. First, the program checks, if the first and the last point recorded have the largest distance of all points in the recording. These points are shown as $A$ and $B$ on figure \ref{fig:line}. Next, the program creates a vector \overrightarrow{AB} and checks if all other points (in this example $C_1$ and $C_2$) are in a certain distance from the vector. This distance is defined by the constant \texttt{LINE\_TOLERANCE\_PX}. The last step is checking if the rate of points which are too far away is less than or equal to \texttt{TOLERANCE\_GENERAL}, which is 0.25 by default.
+            Line detection in this program is done in a very straight forward way. First, the program checks, if the first and the last point recorded have the largest distance of all points in the recording. These points are represented as $A$ and $B$ on figure \ref{fig:line}. Next, the program creates a vector \overrightarrow{AB} and checks if all other points (in this example $C_1$ and $C_2$) are in a certain distance from the vector. This distance is defined by the constant \texttt{LINE\_TOLERANCE\_PX}. The last step is checking if the rate of points which are too far away is less than or equal to \texttt{TOLERANCE\_GENERAL}, which is 0.25 by default.
 
             Assuming that $A$, $B$ and $C_2$ in this example are in the tolerated distance, figure \ref{fig:line} would be detected as a line because 0.75 of all points have passed the distance check.
 
@@ -61,9 +66,9 @@
                 \caption{Line detection}
                 \label{fig:circle}
             \end{wrapfigure}
-            The circle detection is much like the line detection. But it does not check if other points are in a certain distance of to a vector. Instead, the center of all points in determined (the average position of all points) and the distances of all points are compared with the average distance a point has to this center. The tolerated deviation of the average is defined by \texttt{CIRCLE\_TOLERANCE}. Once again, the resulting rate of passed points needs to be equal to or less than the \texttt{TOLERANCE\_GENERAL} for the shape to be detected as a circle.
+            The circle detection is much like the line detection. But it does not check if other points are in a certain distance of to a vector. Instead, the centre of all points in determined (the average position of all points) and the distances of all points are compared with the average distance a point has to this centre. The tolerated deviation of the average is defined by \texttt{CIRCLE\_TOLERANCE}. Once again, the resulting rate of passed points needs to be equal to or less than the \texttt{TOLERANCE\_GENERAL} for the shape to be detected as a circle.
 
-            On figure \ref{fig:circle}, $A$ represents the center of the shape, while $B$ in a point with a distance close to the average distance, which is represented by the circle.
+            On figure \ref{fig:circle}, $A$ represents the centre of the shape, while $B$ in a point with a distance close to the average distance, which is represented by the circle.
             
         \subsection{Ellipses}
             \begin{figure}[H]
@@ -91,13 +96,13 @@
 
             Ellipse detection works in a kind of weïrd way and was definitely the hardest to implement. It is divided into two main aspects: the factor of growth and the symmetry of the figure.
 
-            To prepare for determination of those factors, the first step is to get the two points which are the furthest away from each other; in figure \ref{fig:ellipse}, these are represented by $A$ and $B$. After this, the center between those point is defined ($C_1$). The location of this point can be compared with the average coordinate; this is done with a tolerance of \texttt{ELLIPSE\_CENTRUM\_TOLERANCE\_PX}. If the center of the vector \overrightarrow{AB} isn't inside the tolerance area, the shape is discarded as not an ellipse.
+            To prepare for determination of those factors, the first step is to get the two points which are the furthest away from each other; in figure \ref{fig:ellipse}, these are represented by $A$ and $B$. After this, the centre between those point is defined ($C_1$). The location of this point can be compared with the average coordinate; this is done with a tolerance of \texttt{ELLIPSE\_CENTRUM\_TOLERANCE\_PX}. If the centre of the vector \overrightarrow{AB} isn't inside the tolerance area, the shape is discarded as not an ellipse.
 
             \subsubsection*{Factor of growth}
-                Now, the script measures the length between $C_1$ and the point closest to it ($C_2$) and stores this length for the next step, in which two vectors are created: \overrightarrow{C_1A} and \overrightarrow{C_1B}. The program divides those vectors into a number of points (half as many as the whole figure has for each vector) along them ($D$ and $E$). Using those points, the program can now move along vector \overrightarrow{C_1A} and \overrightarrow{C_1B} to check at each stop, if the distance to the closest point of the figure is shorter than the distance measured at the previous stop (I.e. e.g. if \overrightarrow{d} is shorter than \overrightarrow{e}.). 
+                Now, the script measures the length between $C_1$ and the point closest to it ($C_2$) and stores this length for the next step, in which two vectors are created: \overrightarrow{C_1A} and \overrightarrow{C_1B}. The program divides those vectors into a number of points (half as many as the whole figure has for each vector) along them ($D$ and $E$). Using those points, the program can now move along vector \overrightarrow{C_1A} and \overrightarrow{C_1B} to check at each stop, if the distance to the closest point of the figure is shorter than the distance measured at the previous stop (I.e., e.g., if \overrightarrow{d} is shorter than \overrightarrow{e}.). 
 
             \subsubsection*{Symmetry}
-                At each stop, the generated vector (e.g. \overrightarrow{d}) is mirrored to check if there is another point with a similar distance on the other side of \overrightarrow{AB}. How far such a point may be is determined by the \texttt{ELLIPSE\_TOLERANCE} constant.\hfill
+                At each stop, the generated vector (e.g. \overrightarrow{d}) is mirrored to check if there is another point with a similar distance on the other side of \overrightarrow{AB}. How far such a point may be is determined by the \texttt{ELLIPSE\_TOLERANCE} constant.
 
             \subsubsection*{Evaluation}
                 To evaluate the two factors above, a level of \texttt{perfection} ($p$), is calculated using the factor of growth ($F_g$) and the factor of points without a mirrored twin ($F_t$): $$p=\frac{(F_g + F_t)}{2}$$ If the perfection is bigger than \texttt{TOLERANCE\_GENERAL}, the shape is seen as an ellipse. While this method is working well to distinguish circles from ellipses, it is not able to distinguish an ellipse from a rhombus. Another problem is, that a lot of tolerance is needed to be able to detect a hand-drawn ellipse.
@@ -105,46 +110,51 @@
     \section{Code components}
         This section gives a brief overview of some core parts of the code. This is not meant to be a proper documentation of the code but just a quick summary of some functionality.
 
-        \subsection{Constants}
-            N.b. most of the constants are explained in section \ref{sec:shape_detection} with more detail.\hfill\break
+        {
+            \raggedright
+            \subsection{Constants}
+                N.b. most of the constants are explained in section \ref{sec:shape_detection} with more detail.\break
 
-            \texttt{END\_FIGURE\_TIMEOUT} is the amount of 'frames' which have to be the same in a row for a running recording of mouse movement to get stopped and evaluated.\hfill\break
+                \texttt{END\_FIGURE\_TIMEOUT} is the amount of 'frames' which have to be the same in a row for a running recording of mouse movement to get stopped and evaluated.\break
 
-            \texttt{FRAMERATE\_FPS} the amount of 'frames' taken every second while recording. Every frame is a \texttt{Vector2D} added to the \texttt{coordinates} field of the \texttt{Recording} vector.\hfill\break
+                \texttt{FRAMERATE\_FPS} the amount of 'frames' taken every second while recording. Every frame is a \texttt{Vector2D} added to the \texttt{coordinates} field of the \texttt{Recording} vector.\break
 
-            \texttt{TOLERANCE\_GENERAL}, \texttt{CIRCLE\_TOLERANCE} and \texttt{ELLIPSE\_TOLERANCE} are factors used as tolerances while checking if a \texttt{Recording} is of a specific \texttt{Shape}.\hfill\break
+                \texttt{TOLERANCE\_GENERAL}, \texttt{CIRCLE\_TOLERANCE} and \texttt{ELLIPSE\_TOLERANCE} are factors used as tolerances while checking if a \texttt{Recording} is of a specific \texttt{Shape}.\break
 
-            \texttt{LINE\_TOLERANCE\_PX} and \texttt{ELLIPSE\_CENTRUM\_TOLERANCE\_PX} are pixel amounts used as tolerances while checking if a \texttt{Recording} is of a specific \texttt{Shape}.
+                \texttt{LINE\_TOLERANCE\_PX} and \texttt{ELLIPSE\_CENTRUM\_TOLERANCE\_PX} are pixel amounts used as tolerances while checking if a \texttt{Recording} is of a specific \texttt{Shape}.
 
-        \subsection{Structs}
-            \label{sec:structs}
-            \texttt{Vector2D} is a two-dimensional vector; also used as coordinate in the script. I didn't use any existing class to be able to implement all functions myself.\hfill\break
+            \subsection{Structs}
+                \label{sec:structs}
+                The \texttt{Recording} struct has a more detailed description is section \ref{sec:recording}.\break
 
-            \texttt{Recording} is a struct used to manage the current recording-session of mouse movement. As soon as it is finished, the coordinates will be cloned into a new \texttt{Shape} and the \texttt{Recording} object will be discarded.\hfill\break
+                \texttt{Vector2D} is a two-dimensional vector which is also used as coordinate in the script. I didn't use any existing class to be able to implement all functions myself.\break
 
-            \texttt{Shape} is used to store a set of coordinates and the associated \texttt{ShapeName}. The struct mainly exists because originally, the \texttt{shape\_collection} Vec should be exportable for other programs. Maybe I'll add this feature in the future.\hfill\break
+                \texttt{Recording} is a struct used to manage the current recording-session of mouse movement. As soon as it is finished, the coordinates will be cloned into a new \texttt{Shape} and the \texttt{Recording} object will be discarded.\break
 
-            \texttt{DistanceSet} is used to store the shortest and longest possible vectors in the \texttt{Shape} and the associated lengths.\hfill\break
+                \texttt{Shape} is used to store a set of coordinates and the associated \texttt{ShapeName}. The struct mainly exists because originally, the \texttt{shape\_collection} Vec should be exportable for other programs. Maybe I'll add this feature in the future.\break
 
-            \texttt{PointDistanceSet} is much similar to \texttt{DistanceSet}. It is returned by a single function getting the minimum and maximum vectors between a point and all other points in the \texttt{Shape}. The function also adds a some evaluation data relevant for circles.
+                \texttt{DistanceSet} is used to store the shortest and longest possible vectors in the \texttt{Shape} and the associated lengths.\break
 
-        \subsection{Functions}
-            I will only mention functions here, which don't have such a self explaining name.\hfill\break
+                \texttt{PointDistanceSet} is much similar to \texttt{DistanceSet}. It is returned by a single function getting the minimum and maximum vectors between a point and all other points in the \texttt{Shape}. The function also adds a some evaluation data relevant for circles.
 
-            \texttt{Recording.update()} runs in a loop every frame to manage the recording.\hfill\break
+            \subsection{Functions}
+                I will only mention functions here, which don't have such a self explaining name.\break
 
-            \texttt{Vector2D.abs()} returns the length of the vector.\hfill\break
+                \texttt{Recording.update()} runs in a loop every frame to manage the recording.\break
 
-            \texttt{Shape.get\_shape\_name()} is the function containing the shape determination functionality.\hfill\break
+                \texttt{Vector2D.abs()} returns the length of the vector.\break
 
-            \texttt{Shape.find\_center()} returns the average \texttt{Vector2D} coordinate of the whole shape.\hfill\break
+                \texttt{Shape.get\_shape\_name()} is the function containing the shape determination functionality.\break
 
-            \texttt{Shape.get\_distances()} returns the \texttt{DistanceSet} mentioned in section \ref{sec:structs}. The explanation there should enough to understand this functions purpose.\hfill\break
+                \texttt{Shape.find\_centre()} returns the average \texttt{Vector2D} coordinate of the whole shape.\break
 
-            \texttt{Shape.get\_point\_distances()} returns the minimum and maximum distance vectors and associated distances of a given point, \texttt{passes\_percent} which determines the probability of which the \texttt{Shape} is a circle, and a bunch of other data relevant for circles.
+                \texttt{Shape.get\_distances()} returns the \texttt{DistanceSet} mentioned in section \ref{sec:structs}. The explanation there should enough to understand this functions purpose.\break
 
+                \texttt{Shape.get\_point\_distances()} returns the minimum and maximum distance vectors and associated distances of a given point, \texttt{passes\_percent} which determines the probability of which the \texttt{Shape} is a circle, and a bunch of other data relevant for circles.
+
+        }
         \subsection{Tests}
             There are four tests to confirm that the code is really able to determine certain shapes. All of them use hand recorded \texttt{Shape}s, which passed the checks pretty good, but no recording contains a perfect shape to test the code. I will probably add perfect shapes to the tests in the future.
 
-            The \texttt{test\_junk()} test has a number of recordings in it, which should not be recognised as any of the currently available shapes. Some of them may be correctly recognised if a new shape is added to the collection of known shapes.
+            The \texttt{test\_junk()} test has a number of recordings in it, which should not be recognized as any of the currently available shapes. Some of them may be correctly recognized if a new shape is added to the collection of known shapes.
 \end{document}
