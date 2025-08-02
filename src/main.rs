@@ -2,16 +2,16 @@
 // Copyright (C) 2025  Linus Tibert
 //
 // This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
+// it under the terms of the GNU Affero General Public Licence as published
+// by the Free Software Foundation, either version 3 of the Licence, or
 // (at your option) any later version.
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
+// GNU Affero General Public Licence for more details.
 //
-// You should have received a copy of the GNU Affero General Public License
+// You should have received a copy of the GNU Affero General Public Licence
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use mouse_position::mouse_position::{Mouse};
@@ -208,11 +208,11 @@ impl Mul for Vector2D {
 
 impl Shape {
     fn get_shape_name(&self) -> ShapeName {
-        let passes_percent_circle: i32 = self.get_point_distances(self.find_center()).passes_percent;
+        let passes_percent_circle: i32 = self.get_point_distances(self.find_centre()).passes_percent;
         let passed_percent_line: f32;
         let max_distance: i32 = self.get_distances().max;
         let start_end_distance: i32 = self.coordinates[0].distance(&self.coordinates[self.coordinates.len()-1]);
-        if self.get_point_distances(self.find_center()).passes_percent >= 100 - (TOLERANCE_GENERAL * 100.0) as i32 {
+        if self.get_point_distances(self.find_centre()).passes_percent >= 100 - (TOLERANCE_GENERAL * 100.0) as i32 {
             println!("CIRCLE ({}%)", passes_percent_circle);
             ShapeName::Circle
         } else if max_distance == start_end_distance {
@@ -235,7 +235,7 @@ impl Shape {
             let max_pair: [Vector2D; 2] = self.get_distances().max_pair;
             let longest_vector: Vector2D = max_pair[0] + max_pair[1];
             let vector_centrum: Vector2D = longest_vector / 2;
-            let calculated_centrum: Vector2D = self.find_center();
+            let calculated_centrum: Vector2D = self.find_centre();
             if (calculated_centrum - vector_centrum).abs() as i32 <= ELLIPSE_CENTRUM_TOLERANCE_PX {
                 let check_point_amount: i32 = (self.coordinates.len()/2) as i32;
                 let mut last_distance: f32 = f32::MAX;
@@ -283,7 +283,7 @@ impl Shape {
         }
     }
 
-    fn find_center(&self) -> Vector2D {
+    fn find_centre(&self) -> Vector2D {
         let mut average_coordinate: Vector2D = Vector2D { x: 0, y: 0 };
         for coordinate in &self.coordinates {
             average_coordinate.x += coordinate.x;
