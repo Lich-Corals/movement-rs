@@ -114,7 +114,7 @@
                 At each stop, the generated vector (e.g. \overrightarrow{d}) is mirrored to check if there is another point with a similar distance on the other side of \overrightarrow{AB}. How far such a point may be is determined by the \texttt{ELLIPSE\_TOLERANCE} constant.
 
             \subsubsection*{Evaluation}
-                To evaluate the two factors above, a level of \texttt{perfection} ($p$), is calculated using the factor of growth ($F_g$) and the factor of points without a mirrored twin ($F_t$): $$p=\frac{(F_g + F_t)}{2}$$ If the perfection is bigger than \texttt{TOLERANCE\_GENERAL}, the shape is seen as an ellipse. While this method is working well to distinguish circles from ellipses, it is not able to distinguish an ellipse from a rhombus. Another problem is, that a lot of tolerance is needed to be able to detect a hand-drawn ellipse.
+                To evaluate the two factors above, a level of \texttt{imperfection} ($p$), is calculated using the factor of growth ($F_g$) and the factor of points without a mirrored twin ($F_t$): $$p=\frac{(F_g + F_t)}{2}$$ If the imperfection is bigger than \texttt{TOLERANCE\_GENERAL}, the shape is not seen as an ellipse. While this method is working well to distinguish circles from ellipses, it is not able to distinguish an ellipse from a rhombus. Another problem is, that a lot of tolerance is needed to be able to detect a hand-drawn ellipse.
 
     \section{Code components}
         This section gives a brief overview of some core parts of the code. This is not meant to be a proper documentation of the code but just a quick summary of some functionality.

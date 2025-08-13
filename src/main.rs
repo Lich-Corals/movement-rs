@@ -268,12 +268,12 @@ impl Shape {
                 }
                 let grow_factor: f32 = grow / (shrink + grow);
                 let distance_error_factor: f32 = distance_errors / (distance_passed + distance_errors);
-                let perfection: f32 = (grow_factor + distance_error_factor) / 2.0;
-                if perfection > TOLERANCE_GENERAL {
-                    println!("UNKNOWN ({}% Ellipse)", ((1.0 - perfection) * 100.0) as i32);
+                let imperfection: f32 = (grow_factor + distance_error_factor) / 2.0;
+                if imperfection > TOLERANCE_GENERAL {
+                    println!("UNKNOWN ({}% Ellipse)", ((1.0 - imperfection) * 100.0) as i32);
                     ShapeName::Unknown
                 } else {
-                    println!("ELLIPSE ({}%)", ((1.0 - perfection) * 100.0) as i32);
+                    println!("ELLIPSE ({}%)", ((1.0 - imperfection) * 100.0) as i32);
                     ShapeName::Ellipse
                 }
             } else {
