@@ -241,6 +241,8 @@ impl Shape {
                 let mut last_distance: f32 = f32::MAX;
                 let mut grow: f32 = 0.0;
                 let mut shrink: f32 = 0.0;
+                let mut shrinkage_decreasing: f32 = 0.0; 
+                let mut last_difference: f32 = 0.0;
                 let check_vectors: [Vector2D; 2] = [(calculated_centrum - max_pair[1]) / check_point_amount, (calculated_centrum - max_pair[0]) / check_point_amount];
                 let mut distance_errors: f32 = 0.0;
                 let mut distance_passed: f32 = 0.0;
@@ -252,23 +254,28 @@ impl Shape {
                         let point_min: Vector2D = self.get_closest_to_point(current_check_vector).0;
                         let mirrored_min: Vector2D = current_check_vector + (current_check_vector - point_min) * 2;
                         let mirrored_min_distance: f32 = self.get_closest_to_point(mirrored_min).0.distance_to_line(max_pair[0], max_pair[1]).abs();
+                        let distance_difference: f32 = last_distance - distance_min;
+                        if distance_difference <= last_difference {
+                            shrinkage_decreasing += 1.0;
+                        }
                         if mirrored_min_distance - ELLIPSE_TOLERANCE * distance_min > distance_min || mirrored_min_distance + ELLIPSE_TOLERANCE * distance_min < distance_min {
                             distance_errors += 1.0;
                         } else {
                             distance_passed += 1.0;
                         }
                         if distance_min > last_distance {
-                            
                             grow += 1.0;
                         } else {
                             shrink += 1.0;
                         }
                         last_distance = self.get_point_distances(check_vectors[ii] * i).min as f32;
+                        last_difference = distance_difference;
                     }
                 }
+                let shrinkage_uniformity: f32 = shrinkage_decreasing / (shrink + grow);
                 let grow_factor: f32 = grow / (shrink + grow);
                 let distance_error_factor: f32 = distance_errors / (distance_passed + distance_errors);
-                let imperfection: f32 = (grow_factor + distance_error_factor) / 2.0;
+                let imperfection: f32 = (grow_factor + distance_error_factor + shrinkage_uniformity) / 3.0;
                 if imperfection > TOLERANCE_GENERAL {
                     println!("UNKNOWN ({}% Ellipse)", ((1.0 - imperfection) * 100.0) as i32);
                     ShapeName::Unknown

@@ -103,18 +103,21 @@
                 \label{fig:ellipse}
             \end{figure}
 
-            Ellipse detection works in a kind of weïrd way and was definitely the hardest to implement. It is divided into two main aspects: the factor of growth and the symmetry of the figure.
+            Ellipse detection works in a kind of weïrd way and was definitely the hardest to implement. It is divided into three main aspects: the factor of growth, the uniformity of shrinkage and the symmetry of the figure.
 
-            To prepare for determination of those factors, the first step is to get the two points which are the furthest away from each other; in figure \ref{fig:ellipse}, these are represented by $A$ and $B$. After this, the centre between those point is defined ($C_1$). The location of this point can be compared with the average coordinate; this is done with a tolerance of \texttt{ELLIPSE\_CENTRUM\_TOLERANCE\_PX}. If the centre of the vector \overrightarrow{AB} isn't inside the tolerance area, the shape is discarded as not an ellipse.
+            To prepare for determination of those factors, the first step is to get the two points which are the furthest away from each other; in figure \ref{fig:ellipse}, these are represented by $A$ and $B$. After this, the centre between those points is defined ($C_1$). The location of this point is compared with the average coordinate; this is done with a tolerance of \texttt{ELLIPSE\_CENTRUM\_TOLERANCE\_PX}. If the centre of the vector \overrightarrow{AB} isn't inside the tolerance area, the shape is discarded as not an ellipse.
 
             \subsubsection*{Factor of growth}
-                Now, the script measures the length between $C_1$ and the point closest to it ($C_2$) and stores this length for the next step, in which two vectors are created: \overrightarrow{C_1A} and \overrightarrow{C_1B}. The program divides those vectors into a number of points (half as many as the whole figure has for each vector) along them ($D$ and $E$). Using those points, the program can now move along vector \overrightarrow{C_1A} and \overrightarrow{C_1B} to check at each stop, if the distance to the closest point of the figure is shorter than the distance measured at the previous stop (I.e., e.g., if \overrightarrow{d} is shorter than \overrightarrow{e}.). 
+                Now, the script measures the length between $C_1$ and the point closest to it ($C_2$) and stores this length for the next step, in which two vectors are created: \overrightarrow{C_1A} and \overrightarrow{C_1B}. The program divides those vectors into a number of points (half as many as the whole figure has for each vector) along them ($D$ and $E$). Using those points, the program can now move along vector \overrightarrow{C_1A} and \overrightarrow{C_1B} to check at each stop, if the distance to the closest point of the figure is shorter than the distance measured at the previous stop (I.e., e.g., if \overrightarrow{d} is shorter than \overrightarrow{e}.).
 
             \subsubsection*{Symmetry}
                 At each stop, the generated vector (e.g. \overrightarrow{d}) is mirrored to check if there is another point with a similar distance on the other side of \overrightarrow{AB}. How far such a point may be is determined by the \texttt{ELLIPSE\_TOLERANCE} constant.
 
+            \subsubsection*{Shrinkage uniformity}
+                To be able to distinguish an ellipse from a rhombus, the amount of shrinkage is compared with the previous one. This is done to get a `factor of uniformity', which is very high in a rhombus because the shrinkage at every stop stays the same while the shrinkage in an ellipse gets higher when getting closer to the extreme points ($A$ and $B$).
+
             \subsubsection*{Evaluation}
-                To evaluate the two factors above, a level of \texttt{imperfection} ($p$), is calculated using the factor of growth ($F_g$) and the factor of points without a mirrored twin ($F_t$): $$p=\frac{(F_g + F_t)}{2}$$ If the imperfection is bigger than \texttt{TOLERANCE\_GENERAL}, the shape is not seen as an ellipse. While this method is working well to distinguish circles from ellipses, it is not able to distinguish an ellipse from a rhombus. Another problem is, that a lot of tolerance is needed to be able to detect a hand-drawn ellipse.
+                To evaluate all three factors above, a level of \texttt{imperfection} ($ip$), is calculated using the factor of growth ($F_g$), the shrinkage uniformity ($F_u$) and the factor of points without a mirrored twin ($F_t$): $$ip=\frac{(F_g + F_t + F_u)}{3}$$ If the imperfection is bigger than \texttt{TOLERANCE\_GENERAL}, the shape is not seen as an ellipse. While this method is working well to distinguish circles from ellipses, there are a few problems. The currently most significant one is that a lot of tolerance is needed to be able to detect a hand-drawn ellipse.
 
     \section{Code components}
         This section gives a brief overview of some core parts of the code. This is not meant to be a proper documentation of the code but just a quick summary of some functionality.
