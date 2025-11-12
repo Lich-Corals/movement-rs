@@ -3,7 +3,7 @@
 > [!IMPORTANT]  
 > For and Microsoft- and _other_-Reasons, this project will migrate to Codeberg soon.
 >
-> If you still want to support this project, consider starring it on Codeberghttps://codeberg.org/Lich-Corals/linux-file-converter-addon.
+> If you still want to support this project, consider starring it on Codeberg.
 > 
 > [![Codeberg](https://img.shields.io/badge/-not_on_codeberg_yet-696969?style=for-the-badge&logo=Codeberg&logoColor=white)]()
 
