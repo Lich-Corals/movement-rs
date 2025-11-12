@@ -1,5 +1,12 @@
 # Movement-RS
 
+> [!IMPORTANT]  
+> For and Microsoft- and _other_-Reasons, this project will migrate to Codeberg soon.
+>
+> If you still want to support this project, consider starring it on Codeberghttps://codeberg.org/Lich-Corals/linux-file-converter-addon.
+> 
+> [![Codeberg](https://img.shields.io/badge/-not_on_codeberg_yet-696969?style=for-the-badge&logo=Codeberg&logoColor=white)]()
+
 ## What is this?
 A small project I created to get more familiar with Rust. It is not designed to be useful for any specific purpose, besides learning Rust and having fun.
 <br/>The main feature of the program is recording movement of the cursor and trying to find out if the recording is a circle, an ellipse or a straight line.
