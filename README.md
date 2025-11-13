@@ -1,11 +1,11 @@
 # Movement-RS
 
 > [!IMPORTANT]  
-> For Microsoft- and _other_-Reasons, this project will migrate to Codeberg soon.
+> For Microsoft- and _other_ reasons, this project has been migrated to Codeberg.
 >
 > If you still want to support this project, consider starring it on Codeberg.
 > 
-> [![Codeberg](https://img.shields.io/badge/-not_on_codeberg_yet-696969?style=for-the-badge&logo=Codeberg&logoColor=white)]()
+> [![Codeberg](https://img.shields.io/badge/-view_on_codeberg-2185D0?style=for-the-badge&logo=Codeberg&logoColor=white)](https://codeberg.org/Lich-Corals/movement)
 
 ## What is this?
 A small project I created to get more familiar with Rust. It is not designed to be useful for any specific purpose, besides learning Rust and having fun.
